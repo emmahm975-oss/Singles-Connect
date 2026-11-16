@@ -1,0 +1,106 @@
+{% extends 'core/base.html' %}
+
+{% block content %}
+<section class="section" style="max-width: 600px; padding: 60px 20px; margin: 0 auto;">
+    <h2 style="text-align: center; margin-bottom: 30px;">SINGLES CONNECT <span style="color: #e50914;">CHECKOUT</span></h2>
+    
+    <div style="background: #fff; padding: 30px; border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); margin-top: 30px;">
+        <p><strong>Member:</strong> {{ checkout.member.profile.full_name }}</p>
+        <p><strong>Registration ID:</strong> SC-{{ checkout.member.id }}</p>
+        <p><strong>Country:</strong> {{ checkout.country }}</p>
+        <p><strong>Reference:</strong> {{ checkout.reference }}</p>
+        
+        <hr style="margin: 20px 0; border: 1px solid #eee;">
+
+        {% if checkout.status == 'pending_admin' %}
+            <!-- WAITING FOR ADMIN -->
+            <div style="text-align: center; padding: 20px;">
+                <h3 style="color: #ff9800;">⏳ Waiting for Admin</h3>
+                <p>The administrator is generating your payment details. Please wait a moment...</p>
+                <p style="font-size: 0.8rem; color: #999;">This page will auto-refresh every 10 seconds.</p>
+            </div>
+            <script>
+                setTimeout(function(){ location.reload(); }, 10000);
+            </script>
+
+        {% elif checkout.status == 'pending_payment' %}
+            <!-- ADMIN SENT DETAILS -->
+            <h3 style="color: #e50914; margin-bottom: 15px;">Payment Instructions</h3>
+            
+            <div style="background: #f9f9f9; padding: 20px; border-radius: 8px; margin-bottom: 20px; border-left: 4px solid #e50914; font-size: 1.1rem; white-space: pre-wrap;">
+                {{ checkout.admin_instructions }}
+            </div>
+            
+            <p style="margin-bottom: 20px;"><strong>Amount to Pay:</strong> {{ checkout.amount }} {{ checkout.currency }}</p>
+            <p style="margin-bottom: 30px;"><strong>Reference:</strong> {{ checkout.reference }}</p>
+            
+            <!-- SIMPLE EVIDENCE SUBMISSION -->
+            <h3 style="margin-bottom: 15px;">Submit Payment Evidence</h3>
+            <form method="POST" enctype="multipart/form-data" action="{% url 'submit_evidence' checkout.id %}" style="background: #f9f9f9; padding: 20px; border-radius: 8px;">
+                {% csrf_token %}
+                <p style="margin-bottom: 10px;"><strong>Paste your confirmation message here:</strong></p>
+                <p>
+                    <textarea name="evidence_text" placeholder="Paste the M-Pesa/Airtel message you received here..." rows="5" required style="width:100%; padding:12px; border:1px solid #ddd; border-radius:8px;"></textarea>
+                </p>
+                <p style="margin-bottom: 10px;"><strong>(Optional) Upload a screenshot:</strong></p>
+                <p>
+                    <input type="file" name="evidence_screenshot" accept="image/*" style="width:100%; padding:12px; margin-bottom:10px;">
+                </p>
+                
+                <button type="submit" class="btn btn-red" style="width: 100%;">SUBMIT FOR APPROVAL</button>
+            </form>
+
+        {% elif checkout.status == 'pending_verification' %}
+            <!-- WAITING FOR ADMIN TO VERIFY EVIDENCE -->
+            <div style="text-align: center; padding: 20px;">
+                <h3 style="color: #ff9800;">⏳ PENDING VERIFICATION</h3>
+                <p>Your evidence has been submitted. The administrator is reviewing it.</p>
+                <p style="font-size: 0.8rem; color: #999;">This page will auto-refresh every 10 seconds.</p>
+            </div>
+            <script>
+                setTimeout(function(){ location.reload(); }, 10000);
+            </script>
+        
+                        {% elif checkout.status == 'approved' %}
+             <div style="text-align: center; padding: 20px;">
+                <h3 style="color: #28a745; margin-bottom: 10px;">✅ PAYMENT APPROVED</h3>
+                <p style="margin-bottom: 20px;">You are now connected with:</p>
+                
+                <!-- SHOW THE MATCHED PERSON -->
+                <div style="margin-bottom: 30px;">
+                    {% if matched_profile.profile_photo %}
+                        <img src="{{ matched_profile.profile_photo.url }}" style="width: 120px; height: 120px; border-radius: 50%; object-fit: cover; border: 4px solid #28a745; margin-bottom: 10px;">
+                    {% endif %}
+                    <h2>{{ matched_profile.full_name }}, {{ matched_profile.age }}</h2>
+                    <p style="color: #666;">{{ matched_profile.city }}, {{ matched_profile.country }}</p>
+                </div>
+                
+                <!-- CHAT BUTTON -->
+                {% if connection %}
+                    <a href="{% url 'chat_view' connection.id %}" class="btn btn-red" style="width: 100%; display: block; padding: 15px; font-size: 1.1rem; margin-bottom: 15px;">
+                        💬 Start Chatting Now
+                    </a>
+                {% else %}
+                    <p style="color: red;">Error: Connection not found. Please contact support.</p>
+                {% endif %}
+                
+                <a href="{% url 'dashboard' %}" style="color: #666; text-decoration: none;">Back to Dashboard</a>
+            </div>
+            
+        {% elif checkout.status == 'rejected' %}
+             <div style="text-align: center; padding: 20px;">
+                <h3 style="color: #dc3545; margin-bottom: 10px;">❌ PAYMENT REJECTED</h3>
+                <p style="margin-bottom: 20px;">The administrator could not verify your payment message. Please check the details and try again.</p>
+                
+                <!-- GO BACK TO CHECKOUT TO RE-PASTE MESSAGE -->
+                <a href="{% url 'retry_checkout' checkout.id %}" class="btn btn-red" style="width: 100%; display: block; padding: 15px; font-size: 1.1rem;">
+    Try Again & Paste Message
+</a>
+                
+                <a href="{% url 'dashboard' %}" style="display: block; margin-top: 15px; color: #666; text-decoration: none;">Cancel and go to Dashboard</a>
+            </div>
+        {% endif %}
+
+    </div>
+</section>
+{% endblock %}

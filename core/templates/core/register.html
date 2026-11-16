@@ -1,0 +1,70 @@
+{% extends 'core/base.html' %}
+
+{% block content %}
+<section class="section" style="max-width: 500px; padding: 60px 20px; margin: 0 auto;">
+    <h2 style="text-align: center; margin-bottom: 30px;">Create Your <span style="color: #e50914;">Free Account</span></h2>
+        {% if error %}
+        <div style="background: #f8d7da; color: #721c24; padding: 15px; border-radius: 8px; margin-bottom: 20px; text-align: center; border: 1px solid #f5c6cb;">
+            <strong>Error:</strong> {{ error }}
+        </div>
+    {% endif %}
+    
+    <form method="POST" style="background: #f9f9f9; padding: 30px; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.05);">
+        {% csrf_token %}
+        
+        <p style="margin-bottom: 15px;">
+            <input type="text" name="username" placeholder="Username" required style="width:100%; padding:12px; border:1px solid #ddd; border-radius:8px;">
+        </p>
+        <p style="margin-bottom: 15px;">
+            <input type="email" name="email" placeholder="Email Address" required style="width:100%; padding:12px; border:1px solid #ddd; border-radius:8px;">
+        </p>
+        <p style="margin-bottom: 15px;">
+            <input type="password" name="password" placeholder="Password" required style="width:100%; padding:12px; border:1px solid #ddd; border-radius:8px;">
+        </p>
+        <p style="margin-bottom: 15px;">
+            <input type="text" name="full_name" placeholder="Full Name" required style="width:100%; padding:12px; border:1px solid #ddd; border-radius:8px;">
+        </p>
+        
+        <!-- ADDED PHONE & GENDER FIELDS -->
+        <p style="margin-bottom: 15px;">
+            <input type="text" name="phone" placeholder="Phone Number (e.g., 0712345678)" required style="width:100%; padding:12px; border:1px solid #ddd; border-radius:8px;">
+        </p>
+        <p style="margin-bottom: 15px;">
+            <select name="gender" required style="width:100%; padding:12px; border:1px solid #ddd; border-radius:8px;">
+                <option value="" disabled selected>Select Your Gender</option>
+                <option value="M">Male</option>
+                <option value="F">Female</option>
+            </select>
+        </p>
+        
+        <p style="margin-bottom: 15px;">
+            <input type="number" name="age" placeholder="Age (18+ only)" min="18" required style="width:100%; padding:12px; border:1px solid #ddd; border-radius:8px;">
+        </p>
+        <p style="margin-bottom: 15px;">
+            <input type="text" name="country" placeholder="Country (e.g. Kenya, Nigeria)" required style="width:100%; padding:12px; border:1px solid #ddd; border-radius:8px;">
+        </p>
+        <p style="margin-bottom: 25px;">
+            <input type="text" name="city" placeholder="City or Town" required style="width:100%; padding:12px; border:1px solid #ddd; border-radius:8px;">
+        </p>
+
+        <!-- Matchmaking Preferences -->
+        <h4 style="margin-top: 20px; margin-bottom: 10px; color: #e50914;">Who are you looking for?</h4>
+        
+        <p style="margin-bottom: 15px;">
+            <select name="pref_gender" required style="width:100%; padding:12px; border:1px solid #ddd; border-radius:8px;">
+                <option value="F">Looking for a Woman</option>
+                <option value="M">Looking for a Man</option>
+            </select>
+        </p>
+        <p style="margin-bottom: 15px; display: flex; gap: 10px;">
+            <input type="number" name="pref_min_age" placeholder="Min Age" value="18" min="18" required style="width:50%; padding:12px; border:1px solid #ddd; border-radius:8px;">
+            <input type="number" name="pref_max_age" placeholder="Max Age" value="40" required style="width:50%; padding:12px; border:1px solid #ddd; border-radius:8px;">
+        </p>
+        <p style="margin-bottom: 15px;">
+            <input type="text" name="pref_country" placeholder="Preferred Country (Leave blank for Any)" style="width:100%; padding:12px; border:1px solid #ddd; border-radius:8px;">
+        </p>
+        
+        <button type="submit" class="btn btn-red" style="width: 100%; border: none; cursor: pointer; font-size: 1.1rem;">Register Now</button>
+    </form>
+</section>
+{% endblock %}

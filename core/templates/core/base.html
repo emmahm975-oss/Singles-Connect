@@ -1,0 +1,35 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Singles Connect - Find Your Person.</title>
+    <link rel="stylesheet" href="{% static 'style.css' %}">
+</head>
+<body>
+    <nav>
+        <div class="brand">SINGLES <span>CONNECT</span></div>
+                <ul>
+            <li><a href="{% url 'home' %}">Home</a></li>
+            <li><a href="{% url 'discover' %}">Discover</a></li>
+            <li><a href="{% url 'home' %}#how-it-works">How It Works</a></li>
+            <li><a href="{% url 'success_stories' %}">Success Stories</a></li>
+            {% if user.is_authenticated %}
+                <li><a href="{% url 'dashboard' %}">Dashboard</a></li>
+                <li><a href="{% url 'logout' %}">Logout</a></li>
+            {% else %}
+                <li><a href="{% url 'login' %}">Login</a></li>
+                <li><a href="{% url 'register' %}">Register</a></li>
+            {% endif %}
+        </ul>
+    </nav>
+
+    <!-- This is where other pages will insert their content -->
+    {% block content %}{% endblock %}
+
+    <footer>
+        &copy; 2026 Singles Connect. Find Your Person. Build Your Future.
+    </footer>
+</body>
+</html>

@@ -1,0 +1,101 @@
+{% extends 'core/base.html' %}
+
+{% block content %}
+<section class="section" style="max-width: 600px; padding: 20px 20px; margin: 0 auto; height: 85vh; display: flex; flex-direction: column;">
+    
+    <!-- Header -->
+    <div style="display: flex; align-items: center; margin-bottom: 15px;">
+        <a href="{% url 'dashboard' %}" style="color: #666; text-decoration: none; margin-right: 15px; font-weight: bold;">&larr; Back</a>
+        <h2 style="margin: 0;">Chat with <span style="color: #e50914;">{{ other_user.profile.full_name }}</span></h2>
+        <div style="display: flex; align-items: center; margin-bottom: 15px; justify-content: space-between;">
+    <div style="display: flex; align-items: center;">
+        <a href="{% url 'dashboard' %}" style="color: #666; text-decoration: none; margin-right: 15px; font-weight: bold;">&larr; Back</a>
+        <h2 style="margin: 0;">Chat with <span style="color: #e50914;">{{ other_user.profile.full_name }}</span></h2>
+    </div>
+    
+    <!-- BLOCK BUTTON -->
+    <a href="{% url 'block_user' other_user.id %}" style="color: #dc3545; text-decoration: none; font-size: 0.9rem; font-weight: bold;" onclick="return confirm('Are you sure you want to block this user? You will no longer see their messages.');">🚫 Block/Report</a>
+</div>
+    </div>
+
+    <!-- Chat Box -->
+    <div style="background: #fff; border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); overflow: hidden; display: flex; flex-direction: column; flex: 1;">
+        
+        <!-- Messages Area (Scrollable) -->
+        <div id="chat-history" style="flex: 1; padding: 20px; overflow-y: auto; background: #f9f9f9; display: flex; flex-direction: column; gap: 15px;">
+            {% for message in messages %}
+                {% if message.sender == request.user %}
+                    <div style="align-self: flex-end; background: #e50914; color: white; padding: 10px 15px; border-radius: 15px 15px 0 15px; max-width: 80%;">
+                        {{ message.content }}
+                    </div>
+                {% else %}
+                    <div style="align-self: flex-start; background: #fff; color: #333; padding: 10px 15px; border-radius: 15px 15px 15px 0; border: 1px solid #ddd; max-width: 80%;">
+                        {{ message.content }}
+                    </div>
+                {% endif %}
+            {% endfor %}
+        </div>
+
+        <!-- Input Area (Fixed at bottom) -->
+        <div style="display: flex; border-top: 1px solid #eee; background: #fff;">
+            <input type="text" id="chat-message-input" placeholder="Type a message..." autocomplete="off" style="flex: 1; padding: 15px 20px; border: none; outline: none; font-size: 1rem;">
+            <button id="chat-message-submit" class="btn btn-red" style="border-radius: 0; padding: 0 30px; margin: 0; cursor: pointer;">Send</button>
+        </div>
+    </div>
+</section>
+
+{{ connection.id|json_script:"connection-id" }}
+{{ request.user.id|json_script:"user-id" }}
+
+<script>
+    const connectionId = JSON.parse(document.getElementById('connection-id').textContent);
+    const currentUserId = JSON.parse(document.getElementById('user-id').textContent);
+    const chatHistory = document.getElementById('chat-history');
+    const messageInput = document.getElementById('chat-message-input');
+
+    // Scroll to bottom on load
+    chatHistory.scrollTop = chatHistory.scrollHeight;
+
+    // Connect to WebSocket (Using wss for secure, or ws for local)
+    const chatSocket = new WebSocket(
+        'ws://' + window.location.host + '/ws/chat/' + connectionId + '/'
+    );
+
+    // Handle incoming messages
+    chatSocket.onmessage = function(e) {
+        const data = JSON.parse(e.data);
+        
+        // Create message div
+        const messageDiv = document.createElement('div');
+        messageDiv.innerText = data.message;
+        
+        if (data.user_id === currentUserId) {
+            messageDiv.style.cssText = "align-self: flex-end; background: #e50914; color: white; padding: 10px 15px; border-radius: 15px 15px 0 15px; max-width: 80%;";
+        } else {
+            messageDiv.style.cssText = "align-self: flex-start; background: #fff; color: #333; padding: 10px 15px; border-radius: 15px 15px 15px 0; border: 1px solid #ddd; max-width: 80%;";
+        }
+        
+        chatHistory.appendChild(messageDiv);
+        chatHistory.scrollTop = chatHistory.scrollHeight;
+    };
+
+    // Send message
+    document.querySelector('#chat-message-submit').onclick = function(e) {
+        const message = messageInput.value;
+        if (message.trim() !== '') {
+            chatSocket.send(JSON.stringify({
+                'message': message
+            }));
+            messageInput.value = '';
+        }
+    };
+
+    // Allow pressing Enter to send
+    messageInput.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            document.querySelector('#chat-message-submit').click();
+        }
+    });
+</script>
+{% endblock %}

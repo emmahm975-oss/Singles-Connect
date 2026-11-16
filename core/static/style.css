@@ -1,0 +1,307 @@
+/* SINGLES CONNECT - Black, White, Red */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background: #ffffff;
+    color: #111;
+    line-height: 1.6;
+}
+
+/* Navigation Bar */
+nav {
+    background: #000;
+    padding: 18px 40px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+nav .brand {
+    color: #fff;
+    font-size: 1.5rem;
+    font-weight: 800;
+    letter-spacing: 2px;
+}
+
+nav .brand span {
+    color: #e50914; /* Red */
+}
+
+nav ul {
+    list-style: none;
+    display: flex;
+    gap: 25px;
+}
+
+nav ul li a {
+    color: #fff;
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.2s;
+}
+
+nav ul li a:hover {
+    color: #e50914;
+}
+
+/* Hero Banner */
+.hero {
+    background: linear-gradient(135deg, #000 0%, #1a1a1a 100%);
+    color: #fff;
+    padding: 100px 20px;
+    text-align: center;
+}
+
+.hero h1 {
+    font-size: 3rem;
+    margin-bottom: 15px;
+}
+
+.hero h1 span {
+    color: #e50914;
+}
+
+.hero p {
+    font-size: 1.2rem;
+    color: #ccc;
+    margin-bottom: 35px;
+}
+
+/* Buttons */
+.btn {
+    display: inline-block;
+    padding: 14px 36px;
+    border-radius: 50px;
+    text-decoration: none;
+    font-weight: 700;
+    font-size: 1rem;
+    transition: transform 0.2s, box-shadow 0.2s;
+    margin: 6px;
+}
+
+.btn-red {
+    background: #e50914;
+    color: #fff;
+    box-shadow: 0 4px 15px rgba(229, 9, 20, 0.4);
+}
+
+.btn-red:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(229, 9, 20, 0.6);
+}
+
+.btn-white {
+    background: #fff;
+    color: #000;
+}
+
+.btn-white:hover {
+    transform: translateY(-2px);
+}
+
+/* Footer */
+footer {
+    background: #000;
+    color: #999;
+    text-align: center;
+    padding: 30px;
+    margin-top: 60px;
+}
+/* ... (keep the nav, hero, and footer styles you already have) ... */
+
+/* Dashboard Layout */
+.dashboard-container {
+    display: flex;
+    gap: 30px;
+    max-width: 1200px;
+    margin: 40px auto;
+    padding: 0 20px;
+    align-items: flex-start;
+}
+
+/* Sidebar Profile Card */
+.sidebar-profile {
+    flex: 1;
+    min-width: 300px;
+    background: #000;
+    color: #fff;
+    border-radius: 20px;
+    padding: 30px;
+    text-align: center;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+    position: sticky;
+    top: 100px;
+}
+
+.sidebar-profile img {
+    width: 160px;
+    height: 160px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 5px solid #e50914;
+    margin-bottom: 20px;
+}
+
+.sidebar-profile h2 {
+    font-size: 1.8rem;
+    margin-bottom: 5px;
+}
+
+.sidebar-profile .location {
+    color: #aaa;
+    margin-bottom: 15px;
+}
+
+.sidebar-profile .bio {
+    font-style: italic;
+    color: #ddd;
+    margin-bottom: 25px;
+    font-size: 0.95rem;
+}
+
+.sidebar-profile .btn-group {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+}
+
+/* Match Grid */
+.matches-section {
+    flex: 2.5;
+}
+
+.matches-section h2 {
+    font-size: 2rem;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.matches-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 20px;
+}
+
+/* Match Card */
+.match-card {
+    background: #fff;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+    transition: transform 0.3s, box-shadow 0.3s;
+    border: 1px solid #eee;
+}
+
+.match-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(229, 9, 20, 0.15);
+    border-color: #e50914;
+}
+
+.match-card img {
+    width: 100%;
+    height: 280px;
+    object-fit: cover;
+}
+
+.match-info {
+    padding: 15px;
+}
+
+.match-info h3 {
+    font-size: 1.2rem;
+    margin-bottom: 5px;
+    color: #000;
+}
+
+.match-info p {
+    color: #666;
+    font-size: 0.9rem;
+    margin-bottom: 15px;
+}
+
+.connect-btn {
+    display: block;
+    width: 100%;
+    text-align: center;
+    background: #e50914;
+    color: #fff;
+    padding: 10px;
+    border-radius: 50px;
+    text-decoration: none;
+    font-weight: bold;
+    transition: background 0.2s;
+}
+
+.connect-btn:hover {
+    background: #b80710;
+}
+/* Premium Background for the whole site */
+body {
+    background-color: #f4f5f7;
+}
+
+/* Make the cards look alive */
+.match-card {
+    background: #fff;
+    border: none;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.match-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 15px 35px rgba(229, 9, 20, 0.15);
+}
+
+.match-card img {
+    width: 100%;
+    height: 300px;
+    object-fit: cover;
+    border-bottom: 3px solid #e50914;
+}
+
+.match-info {
+    padding: 20px;
+    text-align: center;
+}
+
+.match-info h3 {
+    font-size: 1.3rem;
+    margin-bottom: 5px;
+    color: #111;
+}
+
+.match-info p {
+    color: #777;
+    font-size: 0.9rem;
+    margin-bottom: 15px;
+}
+
+.connect-btn {
+    display: block;
+    width: 100%;
+    background: #e50914;
+    color: white;
+    padding: 12px;
+    border-radius: 50px;
+    font-weight: bold;
+    text-decoration: none;
+    transition: background 0.3s;
+    border: none;
+    cursor: pointer;
+}
+
+.connect-btn:hover {
+    background: #b80710;
+}

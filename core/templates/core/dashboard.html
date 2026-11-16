@@ -1,0 +1,192 @@
+{% extends 'core/base.html' %}
+
+{% block content %}
+<div class="dashboard-container">
+    
+    <!-- Left Sidebar -->
+    <div class="sidebar-profile">
+        {% if user.profile.profile_photo %}
+            <img src="{{ user.profile.profile_photo.url }}" alt="Profile Photo">
+        {% else %}
+            <div style="width: 160px; height: 160px; border-radius: 50%; background: #333; margin: 0 auto 20px; display: flex; align-items: center; justify-content: center; font-size: 3rem; border: 5px solid #e50914;">?</div>
+        {% endif %}
+        
+        <h2>{{ user.profile.full_name }}, {{ user.profile.age }}</h2>
+        <p class="location">{{ user.profile.city }}, {{ user.profile.country }}</p>
+        
+        <div style="display: flex; justify-content: space-around; margin: 20px 0; border-top: 1px solid #333; border-bottom: 1px solid #333; padding: 15px 0;">
+            <div>
+                <h4 style="color: #e50914; font-size: 1.5rem;">{{ total_connections }}</h4>
+                <p style="font-size: 0.8rem; color: #999;">Matches</p>
+            </div>
+            <div>
+                <h4 style="color: #e50914; font-size: 1.5rem;">{{ incoming_requests.count }}</h4>
+                <p style="font-size: 0.8rem; color: #999;">Requests</p>
+            </div>
+        </div>
+
+        <div class="btn-group">
+            <a href="{% url 'profile_edit' %}" class="btn btn-white" style="padding: 10px 20px; font-size: 0.9rem;">Edit Profile</a>
+            <a href="{% url 'logout' %}" class="btn btn-red" style="padding: 10px 20px; font-size: 0.9rem;">Logout</a>
+        </div>
+
+        <div style="margin-top: 20px;">
+            <button onclick="copyInviteLink()" class="btn btn-white" style="width: 100%; padding: 10px; font-size: 0.9rem; background: transparent; color: #fff; border: 1px solid #555;">
+                📋 Invite a Friend
+            </button>
+        </div>
+    </div>
+
+    <!-- Right Section -->
+    <div class="matches-section">
+        
+        <!-- ALERTS -->
+        {% if messages %}
+            {% for message in messages %}
+                <div style="background: #d4edda; color: #155724; padding: 15px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #c3e6cb;">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        <!-- Incoming Requests -->
+        {% if incoming_requests %}
+        <div style="background: #fff; padding: 20px; border-radius: 16px; margin-bottom: 30px; box-shadow: 0 5px 20px rgba(0,0,0,0.05);">
+            <h2 style="font-size: 1.5rem; margin-bottom: 15px;">Connection <span style="color: #e50914;">Requests</span></h2>
+            <div style="display: flex; gap: 15px; overflow-x: auto;">
+                {% for req in incoming_requests %}
+                    <div style="text-align: center; min-width: 120px; background: #f9f9f9; padding: 15px; border-radius: 12px;">
+                        {% if req.sender.profile.profile_photo %}
+                            <img src="{{ req.sender.profile.profile_photo.url }}" style="width: 70px; height: 70px; border-radius: 50%; object-fit: cover; border: 2px solid #e50914;">
+                        {% else %}
+                            <div style="width: 70px; height: 70px; border-radius: 50%; background: #eee; margin: 0 auto;"></div>
+                        {% endif %}
+                        <p style="font-size: 0.9rem; font-weight: bold; margin-top: 5px;">{{ req.sender.profile.full_name }}</p>
+                        
+                        <a href="{% url 'accept_connection' req.id %}" class="connect-btn" style="background: #28a745; margin-top: 10px; font-size: 0.8rem; padding: 8px;">ACCEPT</a>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Accepted Matches (Chat Unlocked) -->
+        {% if accepted_connections %}
+        <div style="background: #fff; padding: 20px; border-radius: 16px; margin-bottom: 30px; box-shadow: 0 5px 20px rgba(0,0,0,0.05);">
+            <h2 style="font-size: 1.5rem; margin-bottom: 15px;">Your <span style="color: #e50914;">Matches</span></h2>
+            <div style="display: flex; gap: 15px; overflow-x: auto;">
+                {% for conn in accepted_connections %}
+                    <div style="text-align: center; min-width: 120px; background: #f9f9f9; padding: 15px; border-radius: 12px;">
+                        
+                        <!-- Check who the other person is to show their photo -->
+                        {% if request.user == conn.sender %}
+                            {% if conn.receiver.profile.profile_photo %}
+                                <img src="{{ conn.receiver.profile.profile_photo.url }}" style="width: 70px; height: 70px; border-radius: 50%; object-fit: cover; border: 2px solid #000;">
+                            {% endif %}
+                            <p style="font-weight: bold; margin-top: 10px;">{{ conn.receiver.profile.full_name }}</p>
+                        {% else %}
+                            {% if conn.sender.profile.profile_photo %}
+                                <img src="{{ conn.sender.profile.profile_photo.url }}" style="width: 70px; height: 70px; border-radius: 50%; object-fit: cover; border: 2px solid #000;">
+                            {% endif %}
+                            <p style="font-weight: bold; margin-top: 10px;">{{ conn.sender.profile.full_name }}</p>
+                        {% endif %}
+                        
+                        <!-- The Chat Button now links to the chat_view -->
+                        <a href="{% url 'chat_view' conn.id %}" class="connect-btn" style="margin-top: 10px; font-size: 0.9rem; padding: 8px; background: #000; display: block;">CHAT</a>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Recommended Matches -->
+        <h2>Recommended <span style="color: #e50914;">Matches</span></h2>
+        <div class="matches-grid">
+            {% for profile in recommendations %}
+            <div class="match-card">
+                {% if profile.profile_photo %}
+                    <img src="{{ profile.profile_photo.url }}" alt="{{ profile.full_name }}">
+                {% else %}
+                    <div style="width: 100%; height: 300px; background: #eee; display: flex; align-items: center; justify-content: center; color: #aaa;">No Photo</div>
+                {% endif %}
+                
+                <div class="match-info">
+                    <h3>{{ profile.full_name }}, {{ profile.age }}</h3>
+                    <p>{{ profile.city }}, {{ profile.country }}</p>
+                    
+                    <!-- CONNECT BUTTON -->
+                    <!-- Since our dashboard view already excludes people you sent checkouts to, we don't need the 'Request Sent' check here anymore -->
+                    <form method="POST" action="{% url 'send_connection' profile.user.id %}">
+                        {% csrf_token %}
+                        <button type="submit" class="connect-btn">CONNECT</button>
+                    </form>
+                </div>
+            </div>
+            {% empty %}
+                <div style="background: #fff; padding: 30px; border-radius: 16px; width: 100%;">
+                    <h3>No other profiles found yet.</h3>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+        <!-- SECTION 4: Payment History & Membership Status -->
+        <div style="background: #fff; padding: 20px; border-radius: 16px; margin-top: 30px; box-shadow: 0 5px 20px rgba(0,0,0,0.05);">
+            <h2 style="font-size: 1.5rem; margin-bottom: 15px;">Membership & <span style="color: #e50914;">Payments</span></h2>
+            
+            {% if payment_history %}
+                <table style="width: 100%; border-collapse: collapse; text-align: left;">
+                    <thead>
+                        <tr style="border-bottom: 2px solid #eee;">
+                            <th style="padding: 10px;">Date</th>
+                            <th style="padding: 10px;">Match</th>
+                            <th style="padding: 10px;">Amount</th>
+                            <th style="padding: 10px;">Status</th>
+                            <th style="padding: 10px;">Action</th> 
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for checkout in payment_history %}
+                        <tr style="border-bottom: 1px solid #eee;">
+                            <td style="padding: 10px;">{{ checkout.created_at|date:"M d, Y" }}</td>
+                            <td style="padding: 10px;">{{ checkout.receiver.profile.full_name }}</td>
+                            <td style="padding: 10px;">{{ checkout.amount }} {{ checkout.currency }}</td>
+                            <td style="padding: 10px;">
+                                {% if checkout.status == 'approved' %}
+                                    <span style="color: #28a745; font-weight: bold;">✅ Approved</span>
+                                {% elif checkout.status == 'pending_verification' %}
+                                    <span style="color: #ff9800; font-weight: bold;">⏳ Pending</span>
+                                {% elif checkout.status == 'rejected' %}
+                                    <span style="color: #dc3545; font-weight: bold;">❌ Rejected</span>
+                                {% else %}
+                                    <span style="color: #666;">{{ checkout.status|title }}</span>
+                                {% endif %}
+                            </td>
+                            <td style="padding: 10px;">
+                                {% if checkout.status != 'approved' %}
+                                    <a href="{% url 'delete_checkout' checkout.id %}" style="color: #dc3545; text-decoration: none; font-weight: bold;" onclick="return confirm('Are you sure you want to delete this record?');">Delete</a>
+                                {% else %}
+                                    <span style="color: #ccc;">-</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <p style="color: #666;">You have no payment history yet.</p>
+            {% endif %}
+        </div>
+
+<script>
+function copyInviteLink() {
+    var link = "http://127.0.0.1:8000/register/";
+    navigator.clipboard.writeText(link).then(function() {
+        alert("Invitation code copied! Send it to your friends.");
+    }).catch(function(err) {
+        alert("Failed to copy link. Please try again.");
+    });
+}
+</script>
+{% endblock %}

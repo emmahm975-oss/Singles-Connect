@@ -1,0 +1,30 @@
+{% extends 'core/base.html' %}
+
+{% block content %}
+<section class="section" style="max-width: 400px; padding: 60px 20px; margin: 0 auto;">
+    <h2 style="text-align: center; margin-bottom: 30px;">Welcome <span style="color: #e50914;">Back</span></h2>
+    
+    <form method="POST" style="background: #f9f9f9; padding: 30px; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.05);">
+        {% csrf_token %}
+        {% if error %}
+            <div style="background: #f8d7da; color: #721c24; padding: 10px; border-radius: 8px; margin-bottom: 15px; text-align: center;">
+                {{ error }}
+            </div>
+        {% endif %}
+        
+        <p style="margin-bottom: 15px;">
+            <input type="text" name="username" placeholder="Username" required style="width:100%; padding:12px; border:1px solid #ddd; border-radius:8px;">
+        </p>
+        <p style="margin-bottom: 20px;">
+            <input type="password" name="password" placeholder="Password" required style="width:100%; padding:12px; border:1px solid #ddd; border-radius:8px;">
+        </p>
+        
+        <button type="submit" class="btn btn-red" style="width: 100%; border: none; cursor: pointer; font-size: 1.1rem;">Login</button>
+        
+        <!-- FORGOT PASSWORD LINK -->
+        <div style="text-align: center; margin-top: 20px;">
+            <a href="{% url 'password_reset' %}" style="color: #666; text-decoration: none; font-size: 0.9rem;">Forgot Password?</a>
+        </div>
+    </form>
+</section>
+{% endblock %}

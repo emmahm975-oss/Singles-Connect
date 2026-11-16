@@ -1,0 +1,35 @@
+{% extends 'core/base.html' %}
+
+{% block content %}
+<section class="section" style="max-width: 1100px; padding: 40px 20px; margin: 0 auto;">
+    <h2 style="text-align: center; margin-bottom: 40px;">Discover <span style="color: #e50914;">Singles</span></h2>
+    
+    <div class="matches-grid">
+        {% for profile in profiles %}
+        <div class="match-card">
+            {% if profile.profile_photo %}
+                <img src="{{ profile.profile_photo.url }}" alt="{{ profile.full_name }}">
+            {% else %}
+                <div style="width: 100%; height: 300px; background: #eee; display: flex; align-items: center; justify-content: center; color: #aaa;">No Photo</div>
+            {% endif %}
+            
+            <div class="match-info">
+                <h3>{{ profile.full_name }}, {{ profile.age }}</h3>
+                <p>{{ profile.city }}, {{ profile.country }}</p>
+                
+                <!-- THE REAL CONNECT BUTTON -->
+                <form method="POST" action="{% url 'send_connection' profile.user.id %}">
+                    {% csrf_token %}
+                    <button type="submit" class="connect-btn">CONNECT</button>
+                </form>
+            </div>
+        </div>
+        {% empty %}
+            <div style="background: #fff; padding: 30px; border-radius: 16px; width: 100%; text-align: center;">
+                <h3>No other profiles found yet.</h3>
+                <p style="color: #666; margin-top: 10px;">You need to register a second account to see people here!</p>
+            </div>
+        {% endfor %}
+    </div>
+</section>
+{% endblock %}
