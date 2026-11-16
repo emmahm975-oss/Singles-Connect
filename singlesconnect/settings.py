@@ -164,3 +164,8 @@ CHANNEL_LAYERS = {
         },
     },
 }
+# Production Security Settings for Render (HTTPS)
+CSRF_TRUSTED_ORIGINS = ['https://singles-connect-1jxz.onrender.com']
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True
