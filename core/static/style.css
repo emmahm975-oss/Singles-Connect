@@ -305,3 +305,71 @@ body {
 .connect-btn:hover {
     background: #b80710;
 }
+/* =========================================
+   MOBILE RESPONSIVENESS (Phones & Tablets)
+   ========================================= */
+@media screen and (max-width: 768px) {
+    
+    /* 1. Fix the Navigation Bar */
+    nav {
+        flex-direction: column;
+        padding: 15px;
+    }
+    
+    nav ul {
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 10px;
+        margin-top: 15px;
+        padding: 0;
+    }
+    
+    nav ul li a {
+        font-size: 0.9rem;
+    }
+
+    /* 2. Fix the Hero Banner Text */
+    .hero h1 {
+        font-size: 2.2rem;
+    }
+    
+    .hero p {
+        font-size: 1rem;
+        padding: 0 15px;
+    }
+
+    /* 3. Fix the Buttons */
+    .hero .btn {
+        display: block;
+        width: 80%;
+        margin: 10px auto;
+    }
+
+    /* 4. Fix the Grids (Cards) */
+    .card-grid, 
+    .matches-grid {
+        grid-template-columns: 1fr; /* Make cards stack in a single column */
+        padding: 0 15px;
+    }
+
+    /* 5. Fix the Dashboard Layout */
+    .dashboard-container {
+        flex-direction: column;
+        padding: 0 10px;
+    }
+
+    .sidebar-profile {
+        width: 100%;
+        margin-bottom: 20px;
+    }
+
+    /* 6. Fix the Chat Window */
+    #chat-history {
+        padding: 10px;
+    }
+    
+    /* 7. Prevent horizontal scrolling */
+    body, html {
+        overflow-x: hidden;
+    }
+}
