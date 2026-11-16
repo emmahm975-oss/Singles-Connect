@@ -149,7 +149,7 @@ DEFAULT_FROM_EMAIL = 'momomtnloans@gmail.com'
 # ---------------------------------------------------------
 # TELEGRAM BOT CONFIGURATION
 # ---------------------------------------------------------
-TELEGRAM_BOT_TOKEN = os.environ.get('TELEGRAM_BOT_TOKEN', 'PASTE_YOUR_NEW_TELEGRAM_TOKEN_HERE')
+TELEGRAM_BOT_TOKEN = os.environ.get('TELEGRAM_BOT_TOKEN', '9156369133:AAErWUit_cgIWTzOTP1Xx_VCXEqluwGFbVc')
 TELEGRAM_ADMIN_CHAT_ID = '6452814235'
 
 
