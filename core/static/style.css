@@ -7,7 +7,7 @@
 
 body {
     font-family: 'Segoe UI', Arial, sans-serif;
-    background: #ffffff;
+    background-color: #f4f5f7;
     color: #111;
     line-height: 1.6;
 }
@@ -42,7 +42,7 @@ nav ul li a {
     color: #fff;
     text-decoration: none;
     font-weight: 500;
-    transition: color 0.2s;
+    transition: color 0.2s, background 0.2s;
 }
 
 nav ul li a:hover {
@@ -112,7 +112,6 @@ footer {
     padding: 30px;
     margin-top: 60px;
 }
-/* ... (keep the nav, hero, and footer styles you already have) ... */
 
 /* Dashboard Layout */
 .dashboard-container {
@@ -192,76 +191,18 @@ footer {
 /* Match Card */
 .match-card {
     background: #fff;
-    border-radius: 20px;
-    overflow: hidden;
-    box-shadow: 0 5px 20px rgba(0,0,0,0.08);
-    transition: transform 0.3s, box-shadow 0.3s;
-    border: 1px solid #eee;
-}
-
-.match-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 10px 25px rgba(229, 9, 20, 0.15);
-    border-color: #e50914;
-}
-
-.match-card img {
-    width: 100%;
-    height: 280px;
-    object-fit: cover;
-}
-
-.match-info {
-    padding: 15px;
-}
-
-.match-info h3 {
-    font-size: 1.2rem;
-    margin-bottom: 5px;
-    color: #000;
-}
-
-.match-info p {
-    color: #666;
-    font-size: 0.9rem;
-    margin-bottom: 15px;
-}
-
-.connect-btn {
-    display: block;
-    width: 100%;
-    text-align: center;
-    background: #e50914;
-    color: #fff;
-    padding: 10px;
-    border-radius: 50px;
-    text-decoration: none;
-    font-weight: bold;
-    transition: background 0.2s;
-}
-
-.connect-btn:hover {
-    background: #b80710;
-}
-/* Premium Background for the whole site */
-body {
-    background-color: #f4f5f7;
-}
-
-/* Make the cards look alive */
-.match-card {
-    background: #fff;
-    border: none;
     border-radius: 16px;
     overflow: hidden;
     box-shadow: 0 10px 25px rgba(0,0,0,0.05);
     transition: all 0.3s ease;
+    border: 1px solid #eee;
     position: relative;
 }
 
 .match-card:hover {
     transform: translateY(-8px);
     box-shadow: 0 15px 35px rgba(229, 9, 20, 0.15);
+    border-color: #e50914;
 }
 
 .match-card img {
@@ -305,6 +246,7 @@ body {
 .connect-btn:hover {
     background: #b80710;
 }
+
 /* =========================================
    MOBILE RESPONSIVENESS (Phones & Tablets)
    ========================================= */
@@ -324,11 +266,26 @@ body {
         padding: 0;
     }
     
+    /* 2. Make mobile navigation links look like small buttons */
     nav ul li a {
+        display: inline-block;
+        background: #1a1a1a; /* Dark grey background */
+        border: 1px solid #333;
+        padding: 8px 16px;
+        border-radius: 50px; /* Pill shape */
+        color: #fff;
         font-size: 0.9rem;
+        transition: all 0.3s ease;
     }
 
-    /* 2. Fix the Hero Banner Text */
+    /* Add a red hover effect */
+    nav ul li a:hover {
+        background: #e50914;
+        border-color: #e50914;
+        color: #fff;
+    }
+
+    /* 3. Fix the Hero Banner Text */
     .hero h1 {
         font-size: 2.2rem;
     }
@@ -338,21 +295,21 @@ body {
         padding: 0 15px;
     }
 
-    /* 3. Fix the Buttons */
+    /* 4. Fix the Buttons */
     .hero .btn {
         display: block;
         width: 80%;
         margin: 10px auto;
     }
 
-    /* 4. Fix the Grids (Cards) */
+    /* 5. Fix the Grids (Cards) */
     .card-grid, 
     .matches-grid {
         grid-template-columns: 1fr; /* Make cards stack in a single column */
         padding: 0 15px;
     }
 
-    /* 5. Fix the Dashboard Layout */
+    /* 6. Fix the Dashboard Layout */
     .dashboard-container {
         flex-direction: column;
         padding: 0 10px;
@@ -363,12 +320,12 @@ body {
         margin-bottom: 20px;
     }
 
-    /* 6. Fix the Chat Window */
+    /* 7. Fix the Chat Window */
     #chat-history {
         padding: 10px;
     }
     
-    /* 7. Prevent horizontal scrolling */
+    /* 8. Prevent horizontal scrolling */
     body, html {
         overflow-x: hidden;
     }
