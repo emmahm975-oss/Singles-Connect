@@ -112,7 +112,10 @@ def profile_edit(request):
     if request.method == 'POST':
         profile = request.user.profile
         if 'profile_photo' in request.FILES:
-            profile.profile_photo = request.FILES['profile_photo']
+            # Manually upload to Cloudinary to force it
+            import cloudinary.uploader
+            upload_result = cloudinary.uploader.upload(request.FILES['profile_photo'])
+            profile.profile_photo = upload_result['secure_url']
             
         profile.occupation = request.POST.get('occupation', '')
         profile.bio = request.POST.get('bio', '')
@@ -120,10 +123,7 @@ def profile_edit(request):
         return redirect('dashboard')
         
     return render(request, 'core/profile_edit.html')
-
-def generate_ref():
-    return 'SC' + ''.join(random.choices(string.digits, k=4))
-
+    
 @login_required
 def send_connection(request, user_id):
     receiver = User.objects.get(id=user_id)

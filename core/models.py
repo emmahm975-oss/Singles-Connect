@@ -20,7 +20,7 @@ class Profile(models.Model):
     pref_min_age = models.PositiveIntegerField(default=18)
     pref_max_age = models.PositiveIntegerField(default=40)
     pref_country = models.CharField(max_length=100, blank=True)
-    profile_photo = models.ImageField(upload_to='profiles/', blank=True, null=True)
+    profile_photo = models.URLField(max_length=500, blank=True, null=True)
 
     def __str__(self):
         return self.full_name
