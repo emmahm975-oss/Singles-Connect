@@ -40,6 +40,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'cloudinary_storage',
+    'cloudinary',
     'core',
 ]
 
@@ -169,3 +171,14 @@ CSRF_TRUSTED_ORIGINS = ['https://singles-connect-1jxz.onrender.com']
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 SESSION_COOKIE_SECURE = True
 CSRF_COOKIE_SECURE = True
+# ---------------------------------------------------------
+# CLOUDINARY CONFIGURATION (For Permanent Image Storage)
+# ---------------------------------------------------------
+CLOUDINARY_STORAGE = {
+    'CLOUD_NAME': 'cn7keos9',
+    'API_KEY': '882771462835479',
+    'API_SECRET': 'hWfP95xZYPI07r-9lrIWckOLJg0',
+}
+
+# Tell Django to use Cloudinary for media (user uploads)
+DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
