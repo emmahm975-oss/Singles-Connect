@@ -183,9 +183,9 @@ CLOUDINARY_STORAGE = {
 }
 
 cloudinary.config( 
-  cloud_name = CLOUDINARY_STORAGE['cn7keos9'], 
-  api_key = CLOUDINARY_STORAGE['882771462835479'], 
-  api_secret = CLOUDINARY_STORAGE['hWfP95xZYPI07r-9lrIWckOLJg0'] 
+  cloud_name = CLOUDINARY_STORAGE['CLOUD_NAME'], 
+  api_key = CLOUDINARY_STORAGE['API_KEY'], 
+  api_secret = CLOUDINARY_STORAGE['API_SECRET'] 
 )
 
 # Use Cloudinary for media files
