@@ -9,7 +9,9 @@ https://docs.djangoproject.com/en/6.1/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/6.1/ref/settings/
 """
-
+import cloudinary
+import cloudinary.uploader
+import cloudinary.api
 import os
 import dj_database_url
 from pathlib import Path
@@ -172,7 +174,7 @@ SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 SESSION_COOKIE_SECURE = True
 CSRF_COOKIE_SECURE = True
 # ---------------------------------------------------------
-# CLOUDINARY CONFIGURATION (For Permanent Image Storage)
+# CLOUDINARY CONFIGURATION
 # ---------------------------------------------------------
 CLOUDINARY_STORAGE = {
     'CLOUD_NAME': 'cn7keos9',
@@ -180,5 +182,11 @@ CLOUDINARY_STORAGE = {
     'API_SECRET': 'hWfP95xZYPI07r-9lrIWckOLJg0',
 }
 
-# Tell Django to use Cloudinary for media (user uploads)
+cloudinary.config( 
+  cloud_name = CLOUDINARY_STORAGE['cn7keos9'], 
+  api_key = CLOUDINARY_STORAGE['882771462835479'], 
+  api_secret = CLOUDINARY_STORAGE['hWfP95xZYPI07r-9lrIWckOLJg0'] 
+)
+
+# Use Cloudinary for media files
 DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
