@@ -69,14 +69,18 @@ async def handle_admin_text(update: Update, context: ContextTypes.DEFAULT_TYPE):
             
             photo_path = story_data[user_id].get('photo_path')
             
-            def save_story():
+                        def save_story():
+                import cloudinary.uploader
                 story = SuccessStory(couple_names=names, countries=country, testimonial=testimonial)
                 if photo_path and os.path.exists(photo_path):
-                    with open(photo_path, 'rb') as f:
-                        story.photo.save(f"story_{user_id}.jpg", File(f), save=True)
+                    try:
+                        # Upload directly to Cloudinary
+                        result = cloudinary.uploader.upload(photo_path)
+                        story.photo = result['secure_url']
+                    except Exception as upload_error:
+                        print(f"Cloudinary upload failed: {upload_error}")
                     os.remove(photo_path)
-                else:
-                    story.save()
+                story.save()
             
             try:
                 await sync_to_async(save_story)()

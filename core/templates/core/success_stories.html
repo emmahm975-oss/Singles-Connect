@@ -9,9 +9,12 @@
         {% for story in stories %}
         <div style="background: #fff; border-radius: 16px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.08);">
             {% if story.photo %}
-                <img src="{{ story.photo.url }}" style="width: 100%; height: 250px; object-fit: cover;">
+                <!-- CLICKABLE IMAGE WITH SMALLER HEIGHT -->
+                <a href="{{ story.photo }}" target="_blank">
+                    <img src="{{ story.photo }}" style="width: 100%; height: 200px; object-fit: cover; cursor: pointer;">
+                </a>
             {% else %}
-                <div style="width: 100%; height: 250px; background: #eee; display: flex; align-items: center; justify-content: center; color: #aaa;">No Photo</div>
+                <div style="width: 100%; height: 200px; background: #eee; display: flex; align-items: center; justify-content: center; color: #aaa;">No Photo</div>
             {% endif %}
             
             <div style="padding: 25px;">

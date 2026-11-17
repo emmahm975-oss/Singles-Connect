@@ -77,7 +77,7 @@ class SuccessStory(models.Model):
     couple_names = models.CharField(max_length=200)
     countries = models.CharField(max_length=100)
     testimonial = models.TextField()
-    photo = models.ImageField(upload_to='success_stories/', blank=True, null=True)
+    photo = models.URLField(max_length=500, blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
