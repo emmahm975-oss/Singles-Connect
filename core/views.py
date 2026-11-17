@@ -16,6 +16,9 @@ from django.urls import reverse
 from .models import Profile, Connection, CheckoutSession, Message, SuccessStory, BlockedUser
 from .utils import get_local_amount
 
+def generate_ref():
+    return 'SC' + ''.join(random.choices(string.digits, k=4))
+
 def home(request):
     stories = SuccessStory.objects.all().order_by('-created_at')[:3]
     return render(request, 'core/home.html', {'success_stories': stories})
@@ -112,7 +115,6 @@ def profile_edit(request):
     if request.method == 'POST':
         profile = request.user.profile
         if 'profile_photo' in request.FILES:
-            # Manually upload to Cloudinary to force it
             import cloudinary.uploader
             upload_result = cloudinary.uploader.upload(request.FILES['profile_photo'])
             profile.profile_photo = upload_result['secure_url']
@@ -313,7 +315,6 @@ def password_reset_request(request):
                     reverse('password_reset_confirm', kwargs={'uidb64': uid, 'token': token})
                 )
                 
-                # Configure Brevo API (Bypasses Firewall Blocks)
                 configuration = sib_api_v3_sdk.Configuration()
                 configuration.api_key['api-key'] = settings.BREVO_API_KEY
                 
@@ -336,7 +337,6 @@ def password_reset_request(request):
                     api_instance.send_transac_email(send_smtp_email)
                     messages.success(request, "Password reset link sent! Check your email.")
                 except ApiException as e:
-                    # Show the exact API error on screen if it fails
                     return render(request, 'core/password_reset.html', {'error': f"API failed: {str(e)}"})
             
             return redirect('login')
