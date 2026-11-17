@@ -10,6 +10,7 @@ from asgiref.sync import sync_to_async
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import Application, CommandHandler, CallbackQueryHandler, ContextTypes, MessageHandler, filters
 from django.core.files import File
+from http.server import BaseHTTPRequestHandler, HTTPServer
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'singlesconnect.settings')
@@ -62,7 +63,6 @@ async def handle_admin_text(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id = update.effective_user.id
     current_state = admin_state.get(user_id)
     
-    # --- HANDLE STORY TEXT ---
     if current_state == 'awaiting_story_text':
         parts = update.message.text.split("|")
         if len(parts) == 3:
@@ -95,7 +95,6 @@ async def handle_admin_text(update: Update, context: ContextTypes.DEFAULT_TYPE):
             await update.message.reply_text("❌ Invalid format. Please use: Names | Country | Testimonial")
         return
 
-    # --- HANDLE CHECKOUT PAYMENT DETAILS ---
     if isinstance(current_state, int):
         checkout = await sync_to_async(CheckoutSession.objects.filter(id=current_state).first)()
         if not checkout:
@@ -190,8 +189,15 @@ if __name__ == '__main__':
     bot_thread.daemon = True
     bot_thread.start()
     
-    # 2. Start a dummy Django web server to keep Render happy
-    from django.core.management import execute_from_command_line
-    port = os.environ.get('PORT', '10000')
-    print(f"Starting web server on port {port}...")
-    execute_from_command_line(["manage.py", "runserver", f"0.0.0.0:{port}"])
+    # 2. Start a TINY web server to keep Render awake (instead of full Django)
+    class HealthCheckHandler(BaseHTTPRequestHandler):
+        def do_GET(self):
+            self.send_response(200)
+            self.end_headers()
+            self.wfile.write(b"Bot is running!")
+
+    port = int(os.environ.get('PORT', 10000))
+    print(f"Starting health check server on port {port}...")
+    
+    server = HTTPServer(('0.0.0.0', port), HealthCheckHandler)
+    server.serve_forever()
