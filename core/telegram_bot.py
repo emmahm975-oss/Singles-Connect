@@ -3,6 +3,9 @@ import os
 import django
 import tempfile
 import requests
+import cloudinary
+import cloudinary.uploader
+import threading
 from asgiref.sync import sync_to_async
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import Application, CommandHandler, CallbackQueryHandler, ContextTypes, MessageHandler, filters
@@ -13,7 +16,6 @@ os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'singlesconnect.settings')
 django.setup()
 
 from django.conf import settings
-# ADDED Profile HERE
 from core.models import Profile, CheckoutSession, Connection, SuccessStory
 
 admin_state = {}
@@ -60,6 +62,7 @@ async def handle_admin_text(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id = update.effective_user.id
     current_state = admin_state.get(user_id)
     
+    # --- HANDLE STORY TEXT ---
     if current_state == 'awaiting_story_text':
         parts = update.message.text.split("|")
         if len(parts) == 3:
@@ -69,12 +72,10 @@ async def handle_admin_text(update: Update, context: ContextTypes.DEFAULT_TYPE):
             
             photo_path = story_data[user_id].get('photo_path')
             
-                        def save_story():
-                import cloudinary.uploader
+            def save_story():
                 story = SuccessStory(couple_names=names, countries=country, testimonial=testimonial)
                 if photo_path and os.path.exists(photo_path):
                     try:
-                        # Upload directly to Cloudinary
                         result = cloudinary.uploader.upload(photo_path)
                         story.photo = result['secure_url']
                     except Exception as upload_error:
@@ -94,6 +95,7 @@ async def handle_admin_text(update: Update, context: ContextTypes.DEFAULT_TYPE):
             await update.message.reply_text("❌ Invalid format. Please use: Names | Country | Testimonial")
         return
 
+    # --- HANDLE CHECKOUT PAYMENT DETAILS ---
     if isinstance(current_state, int):
         checkout = await sync_to_async(CheckoutSession.objects.filter(id=current_state).first)()
         if not checkout:
@@ -135,7 +137,6 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await query.edit_message_text(f"Please reply with the payment details for {checkout.reference}.\nJust type the message exactly as you want the member to see it.")
 
 async def members_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    # We use sync_to_async to fetch the profiles AND their user IDs in one safe go
     def get_members_data():
         members = []
         for p in Profile.objects.all():
@@ -158,7 +159,6 @@ async def members_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     total_members = len(profiles_data)
     message = f"👥 *REGISTERED MEMBERS ({total_members})*\n\n"
     
-    # Show up to 30 members to avoid hitting Telegram's message length limit
     for member in profiles_data[:30]:
         phone = member['phone'] if member['phone'] else 'No phone'
         message += (
@@ -172,7 +172,8 @@ async def members_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
         message += f"...and {total_members - 30} more members."
         
     await update.message.reply_text(message, parse_mode="Markdown")
-def run_bot():
+
+def start_bot():
     application = Application.builder().token(settings.TELEGRAM_BOT_TOKEN).build()
     application.add_handler(CommandHandler("start", start))
     application.add_handler(CommandHandler("addstory", add_story_command))
@@ -184,4 +185,13 @@ def run_bot():
     application.run_polling()
 
 if __name__ == '__main__':
-    run_bot()
+    # 1. Start the bot in a background thread
+    bot_thread = threading.Thread(target=start_bot)
+    bot_thread.daemon = True
+    bot_thread.start()
+    
+    # 2. Start a dummy Django web server to keep Render happy
+    from django.core.management import execute_from_command_line
+    port = os.environ.get('PORT', '10000')
+    print(f"Starting web server on port {port}...")
+    execute_from_command_line(["manage.py", "runserver", f"0.0.0.0:{port}"])
