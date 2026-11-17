@@ -8,7 +8,8 @@
         {% for profile in profiles %}
         <div class="match-card">
             {% if profile.profile_photo %}
-                <img src="{{ profile.profile_photo.url }}" alt="{{ profile.full_name }}">
+                <!-- REMOVED .url HERE -->
+                <img src="{{ profile.profile_photo }}" alt="{{ profile.full_name }}">
             {% else %}
                 <div style="width: 100%; height: 300px; background: #eee; display: flex; align-items: center; justify-content: center; color: #aaa;">No Photo</div>
             {% endif %}
@@ -17,7 +18,6 @@
                 <h3>{{ profile.full_name }}, {{ profile.age }}</h3>
                 <p>{{ profile.city }}, {{ profile.country }}</p>
                 
-                <!-- THE REAL CONNECT BUTTON -->
                 <form method="POST" action="{% url 'send_connection' profile.user.id %}">
                     {% csrf_token %}
                     <button type="submit" class="connect-btn">CONNECT</button>

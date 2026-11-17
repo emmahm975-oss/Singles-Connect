@@ -4,18 +4,14 @@
 <section class="section" style="max-width: 600px; padding: 20px 20px; margin: 0 auto; height: 85vh; display: flex; flex-direction: column;">
     
     <!-- Header -->
-    <div style="display: flex; align-items: center; margin-bottom: 15px;">
-        <a href="{% url 'dashboard' %}" style="color: #666; text-decoration: none; margin-right: 15px; font-weight: bold;">&larr; Back</a>
-        <h2 style="margin: 0;">Chat with <span style="color: #e50914;">{{ other_user.profile.full_name }}</span></h2>
-        <div style="display: flex; align-items: center; margin-bottom: 15px; justify-content: space-between;">
-    <div style="display: flex; align-items: center;">
-        <a href="{% url 'dashboard' %}" style="color: #666; text-decoration: none; margin-right: 15px; font-weight: bold;">&larr; Back</a>
-        <h2 style="margin: 0;">Chat with <span style="color: #e50914;">{{ other_user.profile.full_name }}</span></h2>
-    </div>
-    
-    <!-- BLOCK BUTTON -->
-    <a href="{% url 'block_user' other_user.id %}" style="color: #dc3545; text-decoration: none; font-size: 0.9rem; font-weight: bold;" onclick="return confirm('Are you sure you want to block this user? You will no longer see their messages.');">🚫 Block/Report</a>
-</div>
+    <div style="display: flex; align-items: center; margin-bottom: 15px; justify-content: space-between;">
+        <div style="display: flex; align-items: center;">
+            <a href="{% url 'dashboard' %}" style="color: #666; text-decoration: none; margin-right: 15px; font-weight: bold;">&larr; Back</a>
+            <h2 style="margin: 0;">Chat with <span style="color: #e50914;">{{ other_user.profile.full_name }}</span></h2>
+        </div>
+        
+        <!-- BLOCK BUTTON -->
+        <a href="{% url 'block_user' other_user.id %}" style="color: #dc3545; text-decoration: none; font-size: 0.9rem; font-weight: bold;" onclick="return confirm('Are you sure you want to block this user? You will no longer see their messages.');">🚫 Block/Report</a>
     </div>
 
     <!-- Chat Box -->
@@ -53,19 +49,15 @@
     const chatHistory = document.getElementById('chat-history');
     const messageInput = document.getElementById('chat-message-input');
 
-    // Scroll to bottom on load
     chatHistory.scrollTop = chatHistory.scrollHeight;
 
-    // Connect to WebSocket (Using wss for secure, or ws for local)
+    // THIS IS THE CRITICAL FIX FOR LIVE SERVER (wss:// vs ws://)
     const chatSocket = new WebSocket(
-        'ws://' + window.location.host + '/ws/chat/' + connectionId + '/'
+        (window.location.protocol === 'https:' ? 'wss://' : 'ws://') + window.location.host + '/ws/chat/' + connectionId + '/'
     );
 
-    // Handle incoming messages
     chatSocket.onmessage = function(e) {
         const data = JSON.parse(e.data);
-        
-        // Create message div
         const messageDiv = document.createElement('div');
         messageDiv.innerText = data.message;
         
@@ -79,18 +71,14 @@
         chatHistory.scrollTop = chatHistory.scrollHeight;
     };
 
-    // Send message
     document.querySelector('#chat-message-submit').onclick = function(e) {
         const message = messageInput.value;
         if (message.trim() !== '') {
-            chatSocket.send(JSON.stringify({
-                'message': message
-            }));
+            chatSocket.send(JSON.stringify({ 'message': message }));
             messageInput.value = '';
         }
     };
 
-    // Allow pressing Enter to send
     messageInput.addEventListener('keypress', function(e) {
         if (e.key === 'Enter') {
             e.preventDefault();
