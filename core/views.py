@@ -80,32 +80,23 @@ def logout_view(request):
 
 @login_required
 def dashboard(request):
-    user_profile = request.user.profile
+    # Safely get or create a profile for the superuser
+    try:
+        user_profile = request.user.profile
+    except Profile.DoesNotExist:
+        user_profile = Profile.objects.create(
+            user=request.user,
+            full_name=request.user.username.title(),
+            age=30,
+            gender='M',
+            country='Kenya',
+            city='Nairobi'
+        )
     
     matches = Profile.objects.exclude(user=request.user)
     matches = matches.filter(gender=user_profile.pref_gender)
-    matches = matches.filter(age__gte=user_profile.pref_min_age, age__lte=user_profile.pref_max_age)
+    # ... (keep the rest of the dashboard code exactly as it is) ...
     
-    if user_profile.pref_country:
-        matches = matches.filter(country__icontains=user_profile.pref_country)
-        
-    active_checkouts = CheckoutSession.objects.filter(member=request.user).values_list('receiver_id', flat=True)
-    matches = matches.exclude(user__id__in=active_checkouts)
-    
-    recommendations = matches.order_by('?')[:8]
-
-    incoming_requests = Connection.objects.filter(receiver=request.user, status='pending')
-    accepted_connections = Connection.objects.filter(sender=request.user, status='accepted') | Connection.objects.filter(receiver=request.user, status='accepted')
-    payment_history = CheckoutSession.objects.filter(member=request.user).order_by('-created_at')
-
-    return render(request, 'core/dashboard.html', {
-        'recommendations': recommendations,
-        'incoming_requests': incoming_requests,
-        'accepted_connections': accepted_connections,
-        'total_connections': accepted_connections.count(),
-        'payment_history': payment_history,
-    })
-
 @login_required
 def discover(request):
     profiles = Profile.objects.exclude(user=request.user)
