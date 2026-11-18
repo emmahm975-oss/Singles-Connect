@@ -9,10 +9,6 @@ urlpatterns = [
     path('dashboard/', views.dashboard, name='dashboard'),
     path('discover/', views.discover, name='discover'),
     path('profile/edit/', views.profile_edit, name='profile_edit'),
-    path('block/<int:user_id>/', views.block_user, name='block_user'),
-        path('password-reset/', views.password_reset_request, name='password_reset'),
-    
-    # New Checkout Flow (No more payment_page)
     path('connect/<int:user_id>/', views.send_connection, name='send_connection'),
     path('checkout/<int:checkout_id>/', views.checkout_page, name='checkout_page'),
     path('checkout/<int:checkout_id>/submit/', views.submit_evidence, name='submit_evidence'),
@@ -20,12 +16,14 @@ urlpatterns = [
     path('chat/<int:connection_id>/', views.chat_view, name='chat_view'),
     path('checkout/<int:checkout_id>/retry/', views.retry_checkout, name='retry_checkout'),
     path('checkout/<int:checkout_id>/delete/', views.delete_checkout, name='delete_checkout'),
-    path('success_stories/', views.success_stories, name='success_stories'),
-]
-
-    # Admin Dashboard
+    path('success-stories/', views.success_stories, name='success_stories'),
+    path('block/<int:user_id>/', views.block_user, name='block_user'),
+    path('password-reset/', views.password_reset_request, name='password_reset'),
+    
+    # Admin URLs
     path('admin-dashboard/', views.admin_dashboard, name='admin_dashboard'),
     path('admin/send-details/<int:checkout_id>/', views.admin_send_details, name='admin_send_details'),
     path('admin/approve/<int:checkout_id>/', views.admin_approve_payment, name='admin_approve_payment'),
     path('admin/reject/<int:checkout_id>/', views.admin_reject_payment, name='admin_reject_payment'),
     path('admin/add-story/', views.admin_add_story, name='admin_add_story'),
+]
