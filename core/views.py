@@ -120,7 +120,7 @@ def dashboard(request):
         'total_connections': accepted_connections.count(),
         'payment_history': payment_history,
     })
-    
+
 @login_required
 def discover(request):
     profiles = Profile.objects.exclude(user=request.user)
@@ -370,7 +370,10 @@ def admin_dashboard(request):
     pending_admin = CheckoutSession.objects.filter(status='pending_admin').order_by('-created_at')
     pending_verification = CheckoutSession.objects.filter(status='pending_verification').order_by('-created_at')
     approved_payments = CheckoutSession.objects.filter(status='approved').order_by('-created_at')
-    members = Profile.objects.all().order_by('-created_at')
+    
+    # FIX: Removed order_by('-created_at') because Profile doesn't have that field
+    members = Profile.objects.all() 
+    
     stories = SuccessStory.objects.all().order_by('-created_at')
 
     return render(request, 'core/admin_dashboard.html', {
