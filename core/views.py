@@ -80,7 +80,7 @@ def logout_view(request):
 
 @login_required
 def dashboard(request):
-    # Safely get or create a profile for the superuser
+    # 1. Safely get or create the profile (fixes the 500 error for superusers)
     try:
         user_profile = request.user.profile
     except Profile.DoesNotExist:
@@ -93,9 +93,33 @@ def dashboard(request):
             city='Nairobi'
         )
     
+    # 2. Matchmaking Algorithm
     matches = Profile.objects.exclude(user=request.user)
     matches = matches.filter(gender=user_profile.pref_gender)
-    # ... (keep the rest of the dashboard code exactly as it is) ...
+    matches = matches.filter(age__gte=user_profile.pref_min_age, age__lte=user_profile.pref_max_age)
+    
+    if user_profile.pref_country:
+        matches = matches.filter(country__icontains=user_profile.pref_country)
+        
+    active_checkouts = CheckoutSession.objects.filter(member=request.user).values_list('receiver_id', flat=True)
+    matches = matches.exclude(user__id__in=active_checkouts)
+    
+    recommendations = matches.order_by('?')[:8]
+
+    # 3. Fetch requests and connections
+    incoming_requests = Connection.objects.filter(receiver=request.user, status='pending')
+    accepted_connections = Connection.objects.filter(sender=request.user, status='accepted') | Connection.objects.filter(receiver=request.user, status='accepted')
+    
+    # 4. Fetch Payment History
+    payment_history = CheckoutSession.objects.filter(member=request.user).order_by('-created_at')
+
+    return render(request, 'core/dashboard.html', {
+        'recommendations': recommendations,
+        'incoming_requests': incoming_requests,
+        'accepted_connections': accepted_connections,
+        'total_connections': accepted_connections.count(),
+        'payment_history': payment_history,
+    })
     
 @login_required
 def discover(request):
