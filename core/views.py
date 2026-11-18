@@ -13,6 +13,7 @@ from django.contrib.auth.tokens import default_token_generator
 from django.utils.http import urlsafe_base64_encode
 from django.utils.encoding import force_bytes
 from django.urls import reverse
+from django.contrib.admin.views.decorators import staff_member_required
 from .models import Profile, Connection, CheckoutSession, Message, SuccessStory, BlockedUser
 from .utils import get_local_amount
 
@@ -345,24 +346,16 @@ def password_reset_request(request):
             return redirect('login')
             
     return render(request, 'core/password_reset.html')
-    from django.contrib.admin.views.decorators import staff_member_required
-from django.db.models import Q
 
+# ---------------------------------------------------------
+# ADMIN DASHBOARD VIEWS
+# ---------------------------------------------------------
 @staff_member_required
 def admin_dashboard(request):
-    # Fetch pending checkouts (waiting for admin to send details)
     pending_admin = CheckoutSession.objects.filter(status='pending_admin').order_by('-created_at')
-    
-    # Fetch checkouts where user has submitted evidence (waiting for approval)
     pending_verification = CheckoutSession.objects.filter(status='pending_verification').order_by('-created_at')
-    
-    # Fetch all approved payments
     approved_payments = CheckoutSession.objects.filter(status='approved').order_by('-created_at')
-    
-    # Fetch all members
     members = Profile.objects.all().order_by('-created_at')
-    
-    # Fetch all success stories
     stories = SuccessStory.objects.all().order_by('-created_at')
 
     return render(request, 'core/admin_dashboard.html', {
@@ -388,7 +381,6 @@ def admin_approve_payment(request, checkout_id):
     checkout = get_object_or_404(CheckoutSession, id=checkout_id)
     checkout.status = 'approved'
     checkout.save()
-    # Automatically connect the two users
     Connection.objects.get_or_create(sender=checkout.member, receiver=checkout.receiver, defaults={'status': 'accepted'})
     messages.success(request, f"Payment approved for {checkout.member.profile.full_name}!")
     return redirect('admin_dashboard')
@@ -408,7 +400,6 @@ def admin_add_story(request):
         country = request.POST.get('country')
         testimonial = request.POST.get('testimonial')
         
-        # Handle image upload to Cloudinary
         photo_url = ''
         if 'photo' in request.FILES:
             import cloudinary.uploader
