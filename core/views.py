@@ -345,3 +345,83 @@ def password_reset_request(request):
             return redirect('login')
             
     return render(request, 'core/password_reset.html')
+    from django.contrib.admin.views.decorators import staff_member_required
+from django.db.models import Q
+
+@staff_member_required
+def admin_dashboard(request):
+    # Fetch pending checkouts (waiting for admin to send details)
+    pending_admin = CheckoutSession.objects.filter(status='pending_admin').order_by('-created_at')
+    
+    # Fetch checkouts where user has submitted evidence (waiting for approval)
+    pending_verification = CheckoutSession.objects.filter(status='pending_verification').order_by('-created_at')
+    
+    # Fetch all approved payments
+    approved_payments = CheckoutSession.objects.filter(status='approved').order_by('-created_at')
+    
+    # Fetch all members
+    members = Profile.objects.all().order_by('-created_at')
+    
+    # Fetch all success stories
+    stories = SuccessStory.objects.all().order_by('-created_at')
+
+    return render(request, 'core/admin_dashboard.html', {
+        'pending_admin': pending_admin,
+        'pending_verification': pending_verification,
+        'approved_payments': approved_payments,
+        'members': members,
+        'stories': stories,
+    })
+
+@staff_member_required
+def admin_send_details(request, checkout_id):
+    if request.method == 'POST':
+        checkout = get_object_or_404(CheckoutSession, id=checkout_id)
+        checkout.admin_instructions = request.POST.get('instructions')
+        checkout.status = 'pending_payment'
+        checkout.save()
+        messages.success(request, f"Details sent to {checkout.member.profile.full_name}!")
+    return redirect('admin_dashboard')
+
+@staff_member_required
+def admin_approve_payment(request, checkout_id):
+    checkout = get_object_or_404(CheckoutSession, id=checkout_id)
+    checkout.status = 'approved'
+    checkout.save()
+    # Automatically connect the two users
+    Connection.objects.get_or_create(sender=checkout.member, receiver=checkout.receiver, defaults={'status': 'accepted'})
+    messages.success(request, f"Payment approved for {checkout.member.profile.full_name}!")
+    return redirect('admin_dashboard')
+
+@staff_member_required
+def admin_reject_payment(request, checkout_id):
+    checkout = get_object_or_404(CheckoutSession, id=checkout_id)
+    checkout.status = 'rejected'
+    checkout.save()
+    messages.success(request, f"Payment rejected for {checkout.member.profile.full_name}.")
+    return redirect('admin_dashboard')
+
+@staff_member_required
+def admin_add_story(request):
+    if request.method == 'POST':
+        names = request.POST.get('names')
+        country = request.POST.get('country')
+        testimonial = request.POST.get('testimonial')
+        
+        # Handle image upload to Cloudinary
+        photo_url = ''
+        if 'photo' in request.FILES:
+            import cloudinary.uploader
+            upload_result = cloudinary.uploader.upload(request.FILES['photo'])
+            photo_url = upload_result['secure_url']
+            
+        SuccessStory.objects.create(
+            couple_names=names,
+            countries=country,
+            testimonial=testimonial,
+            photo=photo_url
+        )
+        messages.success(request, "Success Story added successfully!")
+        return redirect('admin_dashboard')
+        
+    return redirect('admin_dashboard')

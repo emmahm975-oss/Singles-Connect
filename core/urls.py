@@ -22,3 +22,10 @@ urlpatterns = [
     path('checkout/<int:checkout_id>/delete/', views.delete_checkout, name='delete_checkout'),
     path('success_stories/', views.success_stories, name='success_stories'),
 ]
+
+    # Admin Dashboard
+    path('admin-dashboard/', views.admin_dashboard, name='admin_dashboard'),
+    path('admin/send-details/<int:checkout_id>/', views.admin_send_details, name='admin_send_details'),
+    path('admin/approve/<int:checkout_id>/', views.admin_approve_payment, name='admin_approve_payment'),
+    path('admin/reject/<int:checkout_id>/', views.admin_reject_payment, name='admin_reject_payment'),
+    path('admin/add-story/', views.admin_add_story, name='admin_add_story'),

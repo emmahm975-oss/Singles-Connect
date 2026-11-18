@@ -1,0 +1,81 @@
+{% extends 'core/base.html' %}
+
+{% block content %}
+<section class="section" style="max-width: 1200px; padding: 40px 20px; margin: 0 auto;">
+    <h2 style="text-align: center; margin-bottom: 40px;">Admin <span style="color: #e50914;">Control Center</span></h2>
+
+    {% if messages %}
+        {% for message in messages %}
+            <div style="background: #d4edda; color: #155724; padding: 15px; border-radius: 8px; margin-bottom: 20px;">{{ message }}</div>
+        {% endfor %}
+    {% endif %}
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px;">
+        
+        <!-- Pending Checkouts -->
+        <div style="background: #fff; padding: 20px; border-radius: 16px; box-shadow: 0 5px 20px rgba(0,0,0,0.05);">
+            <h3 style="color: #ff9800;">Pending Checkouts (Send Details)</h3>
+            {% for checkout in pending_admin %}
+                <div style="border-bottom: 1px solid #eee; padding: 15px 0;">
+                    <p><strong>Member:</strong> {{ checkout.member.profile.full_name }} (SC-{{ checkout.member.id }})</p>
+                    <p><strong>Want to connect with:</strong> {{ checkout.receiver.profile.full_name }}</p>
+                    <p><strong>Amount:</strong> {{ checkout.amount }} {{ checkout.currency }} (Ref: {{ checkout.reference }})</p>
+                    <form method="POST" action="{% url 'admin_send_details' checkout.id %}">
+                        {% csrf_token %}
+                        <textarea name="instructions" placeholder="Type payment details here..." required style="width:100%; padding:10px; margin-bottom:10px; border:1px solid #ddd; border-radius:8px;"></textarea>
+                        <button type="submit" class="btn btn-red" style="padding: 8px 15px; font-size: 0.9rem;">Send to Member</button>
+                    </form>
+                </div>
+            {% empty %}
+                <p>No pending checkouts.</p>
+            {% endfor %}
+        </div>
+
+        <!-- Pending Verification -->
+        <div style="background: #fff; padding: 20px; border-radius: 16px; box-shadow: 0 5px 20px rgba(0,0,0,0.05);">
+            <h3 style="color: #2196f3;">Verify Payments</h3>
+            {% for checkout in pending_verification %}
+                <div style="border-bottom: 1px solid #eee; padding: 15px 0;">
+                    <p><strong>Member:</strong> {{ checkout.member.profile.full_name }}</p>
+                    <p><strong>Evidence:</strong> "{{ checkout.evidence_text }}"</p>
+                    <div style="display: flex; gap: 10px; margin-top: 10px;">
+                        <a href="{% url 'admin_approve_payment' checkout.id %}" class="btn btn-red" style="padding: 8px 15px; font-size: 0.9rem; background: #28a745;">Approve</a>
+                        <a href="{% url 'admin_reject_payment' checkout.id %}" class="btn btn-red" style="padding: 8px 15px; font-size: 0.9rem; background: #dc3545;">Reject</a>
+                    </div>
+                </div>
+            {% empty %}
+                <p>No payments waiting for verification.</p>
+            {% endfor %}
+        </div>
+
+        <!-- Add Success Story -->
+        <div style="background: #fff; padding: 20px; border-radius: 16px; box-shadow: 0 5px 20px rgba(0,0,0,0.05);">
+            <h3 style="color: #28a745;">Add Success Story</h3>
+            <form method="POST" action="{% url 'admin_add_story' %}" enctype="multipart/form-data">
+                {% csrf_token %}
+                <input type="text" name="names" placeholder="Names (e.g., John & Mary)" required style="width:100%; padding:10px; margin-bottom:10px; border:1px solid #ddd; border-radius:8px;">
+                <input type="text" name="country" placeholder="Country" required style="width:100%; padding:10px; margin-bottom:10px; border:1px solid #ddd; border-radius:8px;">
+                <textarea name="testimonial" placeholder="Testimonial..." required style="width:100%; padding:10px; margin-bottom:10px; border:1px solid #ddd; border-radius:8px;"></textarea>
+                <input type="file" name="photo" accept="image/*" required style="width:100%; margin-bottom:10px;">
+                <button type="submit" class="btn btn-red" style="width: 100%;">Publish Story</button>
+            </form>
+        </div>
+
+    </div>
+
+    <!-- All Members -->
+    <div style="background: #fff; padding: 20px; border-radius: 16px; margin-top: 30px; box-shadow: 0 5px 20px rgba(0,0,0,0.05);">
+        <h3>Registered Members ({{ members.count }})</h3>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-top: 15px;">
+            {% for member in members %}
+                <div style="background: #f9f9f9; padding: 15px; border-radius: 8px;">
+                    <p><strong>{{ member.full_name }}</strong></p>
+                    <p>{{ member.city }}, {{ member.country }}</p>
+                    <p>📞 {{ member.phone }}</p>
+                    <p>🆔 SC-{{ member.user.id }}</p>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endblock %}

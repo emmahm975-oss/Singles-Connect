@@ -22,6 +22,9 @@
                 <li><a href="{% url 'login' %}">Login</a></li>
                 <li><a href="{% url 'register' %}">Register</a></li>
             {% endif %}
+            {% if user.is_staff %}
+    <li><a href="{% url 'admin_dashboard' %}" style="color: #ff9800;">Admin</a></li>
+{% endif %}
         </ul>
     </nav>
 
