@@ -20,7 +20,7 @@ urlpatterns = [
     path('block/<int:user_id>/', views.block_user, name='block_user'),
     path('password-reset/', views.password_reset_request, name='password_reset'),
     
-        # --- ADMIN URLS (Changed 'admin/' to 'dashboard-admin/') ---
+    # --- CUSTOM ADMIN URLS (Changed from admin/ to dashboard-admin/) ---
     path('dashboard-admin/', views.admin_dashboard, name='admin_dashboard'),
     path('dashboard-admin/send-details/<int:checkout_id>/', views.admin_send_details, name='admin_send_details'),
     path('dashboard-admin/approve/<int:checkout_id>/', views.admin_approve_payment, name='admin_approve_payment'),
