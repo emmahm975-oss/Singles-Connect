@@ -160,37 +160,20 @@ def send_connection(request, user_id):
             country=member.profile.country, currency=currency, amount=amount
         )
         
-        bot_token = settings.TELEGRAM_BOT_TOKEN
-        chat_id = settings.TELEGRAM_ADMIN_CHAT_ID
-        
+        # --- SIMPLE TELEGRAM NOTIFICATION ---
+        from core.telegram_bot import send_telegram_notification
         message = (
             f"🚨 *NEW CHECKOUT REQUEST*\n\n"
             f"*Member:* {member.profile.full_name}\n"
-            f"*Reg ID:* SC-{member.id}\n"
             f"*Country:* {checkout.country}\n"
-            f"*Currency:* {currency}\n"
             f"*Amount:* {symbol} {amount}\n"
             f"*Reference:* {checkout.reference}\n\n"
-            f"*Action Required:* Please send payment details for this checkout."
+            f"Please go to the Admin Dashboard to send payment details."
         )
-        
-        reply_markup = {
-            "inline_keyboard": [
-                [{"text": "💳 Send Payment Details", "callback_data": f"send_details_{checkout.id}"}]
-            ]
-        }
-        
-        url = f"https://api.telegram.org/bot{bot_token}/sendMessage"
-        payload = {
-            "chat_id": chat_id,
-            "text": message,
-            "parse_mode": "Markdown",
-            "reply_markup": reply_markup
-        }
-        requests.post(url, json=payload)
+        send_telegram_notification(message)
     
     return redirect('checkout_page', checkout_id=checkout.id)
-
+    
 @login_required
 def checkout_page(request, checkout_id):
     checkout = get_object_or_404(CheckoutSession, id=checkout_id, member=request.user)
